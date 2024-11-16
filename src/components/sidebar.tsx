@@ -1,10 +1,10 @@
-import React from 'react';
-import { Zap, Home, Users, LineChart, CheckSquare, MessageSquare, LogOut } from 'lucide-react';
+import React, { useState } from 'react'; // Keep this import only
+import { Zap, Home, Users, LineChart, MessageSquare, LogOut, Menu } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const Sidebar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
 
   // Logout handler
@@ -14,20 +14,37 @@ const Sidebar: React.FC = () => {
     window.history.pushState(null, '', '/login'); // Optional
   };
 
+  // Toggle sidebar visibility
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div className="hidden border-r bg-muted/40 lg:block">
-      <div className="flex h-full flex-col">
+    <div className={`lg:flex ${isOpen ? 'w-64' : 'w-16'} flex-col bg-muted/40 border-r transition-all duration-300`}>
+      {/* Toggle Button for Small Screens */}
+      <div className="flex items-center justify-between h-14 px-4 border-b lg:hidden">
+        <button onClick={toggleSidebar} className="text-muted-foreground">
+          <Menu className="h-6 w-6" />
+        </button>
+        <NavLink className="flex items-center gap-2 font-semibold" to="#">
+          <Zap className="h-6 w-6" />
+          {isOpen && <span>CRM Platform</span>}
+        </NavLink>
+      </div>
+
+      {/* Sidebar Content */}
+      <div className="flex flex-col h-full">
         {/* Header Section */}
-        <div className="flex h-14 items-center border-b px-6">
+        <div className="hidden lg:flex h-14 items-center border-b px-6">
           <NavLink className="flex items-center gap-2 font-semibold" to="#">
             <Zap className="h-6 w-6" />
-            <span>CRM Platform</span>
+            {isOpen && <span>CRM Platform</span>}
           </NavLink>
         </div>
 
         {/* Navigation Section */}
-        <div className="flex-1">
-          <nav className="grid items-start px-4 text-sm font-medium">
+        <div className="flex-1 overflow-auto">
+          <nav className="grid gap-2 items-start px-4 py-4 text-sm font-medium">
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
@@ -37,7 +54,7 @@ const Sidebar: React.FC = () => {
               }
             >
               <Home className="h-4 w-4" />
-              Home
+              {isOpen && <span>Home</span>}
             </NavLink>
             <NavLink
               to="/customers"
@@ -48,7 +65,7 @@ const Sidebar: React.FC = () => {
               }
             >
               <Users className="h-4 w-4" />
-              Customers
+              {isOpen && <span>Customers</span>}
             </NavLink>
             <NavLink
               to="/analytics"
@@ -59,18 +76,7 @@ const Sidebar: React.FC = () => {
               }
             >
               <LineChart className="h-4 w-4" />
-              Analytics
-            </NavLink>
-            <NavLink
-              to="/tasks"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 ${
-                  isActive ? 'bg-accent text-primary' : 'text-muted-foreground hover:bg-accent hover:text-primary'
-                }`
-              }
-            >
-              <CheckSquare className="h-4 w-4" />
-              Tasks
+              {isOpen && <span>Analytics</span>}
             </NavLink>
             <NavLink
               to="/messages"
@@ -81,27 +87,19 @@ const Sidebar: React.FC = () => {
               }
             >
               <MessageSquare className="h-4 w-4" />
-              Messages
+              {isOpen && <span>Messages</span>}
             </NavLink>
           </nav>
         </div>
 
-        {/* Footer Section */}
-        <div className="mt-auto p-4 space-y-4">
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle>Upgrade to Pro</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">Upgrade</Button>
-            </CardContent>
-          </Card>
+        {/* Logout Button Section */}
+        <div className={`px-4 mb-9 py-2 ${isOpen ? '' : 'flex items-center justify-center'}`}>
           <Button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white"
           >
             <LogOut className="h-4 w-4" />
-            Logout
+            {isOpen && <span>Logout</span>}
           </Button>
         </div>
       </div>

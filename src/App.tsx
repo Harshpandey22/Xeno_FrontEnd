@@ -3,7 +3,8 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Dashboard from './components/dashboard';
 import Login from './components/login';
 import Sidebar from './components/sidebar';
-import Customers from './components/customers'; // Import the Customers component
+import Customers from './components/customers';
+import CustomerDetails from './components/customerDetails';
 import './index.css';
 
 // ProtectedRoute component for route protection
@@ -73,7 +74,22 @@ const App: React.FC = () => {
             <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
               <Sidebar />
               <div className="flex flex-col w-full p-4">
-                <Customers /> {/* Your Customers component */}
+                <Customers />
+              </div>
+            </div>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Customer Details Route */}
+      <Route
+        path="/customer-details"
+        element={
+          <ProtectedRoute>
+            <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+              <Sidebar />
+              <div className="flex flex-col w-full p-4">
+                <CustomerDetails />
               </div>
             </div>
           </ProtectedRoute>

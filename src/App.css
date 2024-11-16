@@ -1,0 +1,15 @@
+/* Apply overflow: auto to the root element */
+html, body {
+    overflow: auto;
+    height: 100%; /* Ensure it works for full-page scrolling */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Specific for React root div */
+  #root {
+    overflow: auto;
+    max-height: 100vh; /* Optional: Ensures it respects viewport height */
+  }
+  

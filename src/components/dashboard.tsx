@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Bell, LineChart, Users, Settings, HelpCircle, Search } from 'lucide-react';
-import Sidebar from './sidebar';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -9,9 +8,9 @@ const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   return (
-    <div className="grid h-screen w-full lg:grid-cols-[280px_1fr]">
+    <div className="grid h-[50px] min-h-screen overflow-hidden w-full lg:grid-cols-[280px_1fr]">
       {/* Main Content */}
-      <div className="flex flex-col w-[1420px]">
+      <div className="flex  flex-col w-[1380px]">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
           <div className="w-full flex-1">
             <form>
