@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getCustomerSegment } from './service/getNewSegment';
 
 const CustomerDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -19,9 +20,34 @@ const CustomerDetails: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    alert('Form submitted successfully');
-    // Process the formData as needed
+  const handleSubmit = async () => {
+    try {
+      // Convert 'mandatory' to 'AND' and 'non-mandatory' to 'OR'
+      const mapLogicValue = (value: string) => value === 'mandatory' ? 'AND' : 'OR';
+
+      // Prepare API parameters
+      const params = {
+        totalSpent: formData.totalOrderPrice ? Number(formData.totalOrderPrice) : undefined,
+        numVisits: formData.noOfVisits ? Number(formData.noOfVisits) : undefined,
+        lastVisited: formData.lastVisited ? Number(formData.lastVisited) : undefined,
+        productName: formData.productName || undefined,
+        totalSpentLogic: mapLogicValue(formData.totalOrderPriceRequired),
+        numVisitsLogic: mapLogicValue(formData.noOfVisitsRequired),
+        lastVisitedLogic: mapLogicValue(formData.lastVisitedRequired),
+        productNameLogic: mapLogicValue(formData.productNameRequired),
+        segmentName: formData.segmentName || undefined,
+      };
+
+      // Call the API
+      await getCustomerSegment(params);
+      
+      alert('Form submitted successfully');
+      // Redirect to /customers route
+      navigate('/customers');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Error submitting form. Please try again.');
+    }
   };
 
   return (
