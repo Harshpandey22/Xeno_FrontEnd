@@ -32,13 +32,6 @@ const App: React.FC = () => {
     navigate('/dashboard'); // Redirect to dashboard
   };
 
-  // Logout handler
-  const handleLogout = () => {
-    localStorage.removeItem('authToken'); // Clear authentication token
-    setIsAuthenticated(false);
-    navigate('/login', { replace: true }); // Redirect to login
-  };
-
   return (
     <Routes>
       {/* Login Route */}

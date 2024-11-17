@@ -3,7 +3,7 @@ import { LineChart, Users, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Input } from './ui/input';
 import { getCustomerCount, getOrderCount, getTotalRevenue, getCommunicationLogs, CommunicationLog, getCustomerOrderRel, getOrderProductRel } from './service/getAnalyticsData';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Label, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Label} from 'recharts';
 
 const Analytics: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -11,7 +11,7 @@ const Analytics: React.FC = () => {
   const [orderCount, setOrderCount] = useState<number>(0);
   const [revenue, setRevenue] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const [communicationLogs, setCommunicationLogs] = useState<CommunicationLog[]>([]);
+  const [, setCommunicationLogs] = useState<CommunicationLog[]>([]);
   const [customerOrderData, setCustomerOrderData] = useState<{ name: string; orders: number }[]>([]);
   const [productOrderData, setProductOrderData] = useState<{ name: string; orders: number }[]>([]);
 

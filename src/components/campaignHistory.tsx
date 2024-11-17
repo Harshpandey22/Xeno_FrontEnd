@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCommunicationLogs, CommunicationLog } from './service/getAnalyticsData';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle} from './ui/card';
 import ReactPaginate from 'react-paginate';
 
 const CampaignHistory: React.FC = () => {
