@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, LineChart, Users, Settings, HelpCircle, Search } from 'lucide-react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Input } from './ui/input';
 import { getCustomerCount, getOrderCount, getTotalRevenue, getCommunicationLogs, CommunicationLog, getCustomerOrderRel } from './service/getAnalyticsData';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Label } from 'recharts';
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -29,13 +29,21 @@ const Dashboard: React.FC = () => {
         setCustomerCount(customers);
         setOrderCount(orders);
         setRevenue(totalRevenue);
-        setCommunicationLogs(logs);
         
-        // Transform the customer-order data for the chart
-        const transformedData = Object.entries(customerOrders).map(([name, orders]) => ({
-          name,
-          orders
-        }));
+        // Safely handle logs and limit to 5 items
+        if (logs && Array.isArray(logs)) {
+          setCommunicationLogs(logs.slice(0,5));
+        } else {
+          setCommunicationLogs([]);
+        }
+        
+        // Transform and sort the customer-order data for the chart
+        const transformedData = Object.entries(customerOrders || {})
+          .map(([name, orders]) => ({
+            name,
+            orders
+          }))
+          .sort((a, b) => b.orders - a.orders);
         setCustomerOrderData(transformedData);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -50,9 +58,9 @@ const Dashboard: React.FC = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-2 border rounded shadow-sm">
-          <p className="font-medium">{label}</p>
-          <p className="text-sm">Orders: {payload[0].value}</p>
+        <div className="bg-white p-3 border rounded-lg shadow-lg">
+          <p className="font-medium text-sm">{`Customer: ${label}`}</p>
+          <p className="text-sm text-primary">{`Orders: ${payload[0].value}`}</p>
         </div>
       );
     }
@@ -90,10 +98,10 @@ const Dashboard: React.FC = () => {
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <Users className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -101,10 +109,10 @@ const Dashboard: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
-                <LineChart className="h-4 w-4 text-muted-foreground" />
+                <LineChart className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -112,10 +120,10 @@ const Dashboard: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                <LineChart className="h-4 w-4 text-muted-foreground" />
+                <LineChart className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -125,80 +133,96 @@ const Dashboard: React.FC = () => {
             </Card>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4">
-      <CardHeader>
-        <CardTitle>Customer Growth</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="h-[200px] w-full bg-muted rounded-lg animate-pulse" />
-        ) : customerOrderData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={customerOrderData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
-                className="text-xs" 
-                tick={{ fill: 'currentColor' }}
-              />
-              <YAxis 
-                className="text-xs" 
-                tick={{ fill: 'currentColor' }}
-                allowDecimals={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="orders" 
-                fill="currentColor" 
-                radius={[4, 4, 0, 0]}
-                className="fill-primary"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="h-[200px] w-full flex items-center justify-center text-muted-foreground">
-            No data available
-          </div>
-        )}
-      </CardContent>
-    </Card>
-            <Card className="col-span-3">
-        <CardHeader>
-          <CardTitle>Past Campaigns</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 animate-pulse">
-                  <div className="h-8 w-8 rounded-full bg-muted" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-3/4 bg-muted rounded" />
-                    <div className="h-3 w-1/2 bg-muted rounded" />
+            <Card className="col-span-4 hover:shadow-lg transition-shadow duration-200">
+              <CardHeader>
+                <CardTitle>Customer Growth</CardTitle>
+                <CardDescription>Number of orders per customer</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="h-[300px] w-full bg-muted rounded-lg animate-pulse" />
+                ) : customerOrderData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart 
+                      data={customerOrderData} 
+                      margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="name" 
+                        className="text-xs" 
+                        tick={{ fill: 'currentColor' }}
+                      >
+                       
+                      </XAxis>
+                      <YAxis 
+                        className="text-xs" 
+                        tick={{ fill: 'currentColor' }}
+                        allowDecimals={false}
+                      >
+                        <Label 
+                          value="Number of Orders" 
+                          angle={-90} 
+                          position="left"
+                          offset={-10}
+                          className="text-sm fill-current"
+                        />
+                      </YAxis>
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Bar 
+                        name="Customers"
+                        dataKey="orders" 
+                        fill="currentColor" 
+                        radius={[4, 4, 0, 0]}
+                        className="fill-primary"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-[300px] w-full flex items-center justify-center text-muted-foreground">
+                    No data available
                   </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className="col-span-3 hover:shadow-lg transition-shadow duration-200">
+              <CardHeader>
+                <CardTitle>Past Campaigns</CardTitle>
+                <CardDescription>Latest 5 campaign activities</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-4 animate-pulse">
+                        <div className="h-10 w-10 rounded-full bg-muted" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 w-3/4 bg-muted rounded" />
+                          <div className="h-3 w-1/2 bg-muted rounded" />
+                        </div>
+                      </div>
+                    ))
+                  ) : communicationLogs && communicationLogs.length > 0 ? (
+                    communicationLogs.map((log) => (
+                      <div key={log.id} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-sm font-medium text-primary">{log.segmentName}</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium leading-none mb-1">{log.message}</p>
+                          <span className="text-xs text-muted-foreground">{log.segmentName}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-sm text-muted-foreground py-4">
+                      No recent activities
+                    </div>
+                  )}
                 </div>
-              ))
-            ) : communicationLogs.length > 0 ? (
-              communicationLogs.map((log) => (
-                <div key={log.id} className="flex items-center gap-4">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-xs font-medium">{log.segmentName}</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{log.message}</p>
-                    <p className="text-sm text-muted-foreground">{log.segmentName}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center text-sm text-muted-foreground py-4">
-                No recent activities
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
