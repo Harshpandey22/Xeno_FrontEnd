@@ -32,7 +32,7 @@ export const EditCustomerModal: React.FC<EditCustomerModalProps> = ({
     e.preventDefault();
     try {
       await updateCustomerData(customer.customerId, {
-        customer_id: customer.customerId,
+        customerId: customer.customerId,
         ...formData,
         customer_visits: customer.customer_visits
       });
