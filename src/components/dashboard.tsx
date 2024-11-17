@@ -3,7 +3,8 @@ import { Bell, LineChart, Users, Settings, HelpCircle, Search } from 'lucide-rea
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
-import { getCustomerCount, getOrderCount, getTotalRevenue, getCommunicationLogs, CommunicationLog } from './service/getAnalyticsData';
+import { getCustomerCount, getOrderCount, getTotalRevenue, getCommunicationLogs, CommunicationLog, getCustomerOrderRel } from './service/getAnalyticsData';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -12,29 +13,51 @@ const Dashboard: React.FC = () => {
   const [revenue, setRevenue] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [communicationLogs, setCommunicationLogs] = useState<CommunicationLog[]>([]);
+  const [customerOrderData, setCustomerOrderData] = useState<{ name: string; orders: number }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [customers, orders, totalRevenue, logs] = await Promise.all([
+        const [customers, orders, totalRevenue, logs, customerOrders] = await Promise.all([
           getCustomerCount(),
           getOrderCount(),
           getTotalRevenue(),
-          getCommunicationLogs()
+          getCommunicationLogs(),
+          getCustomerOrderRel()
         ]);
         
         setCustomerCount(customers);
         setOrderCount(orders);
         setRevenue(totalRevenue);
         setCommunicationLogs(logs);
+        
+        // Transform the customer-order data for the chart
+        const transformedData = Object.entries(customerOrders).map(([name, orders]) => ({
+          name,
+          orders
+        }));
+        setCustomerOrderData(transformedData);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
       }
-    }; fetchData();
+    };
+
+    fetchData();
   }, []);
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-2 border rounded shadow-sm">
+          <p className="font-medium">{label}</p>
+          <p className="text-sm">Orders: {payload[0].value}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   const formatRevenue = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -102,14 +125,43 @@ const Dashboard: React.FC = () => {
             </Card>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Customer Growth</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[200px] w-full bg-muted rounded-lg" />
-              </CardContent>
-            </Card>
+          <Card className="col-span-4">
+      <CardHeader>
+        <CardTitle>Customer Growth</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="h-[200px] w-full bg-muted rounded-lg animate-pulse" />
+        ) : customerOrderData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={customerOrderData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="name" 
+                className="text-xs" 
+                tick={{ fill: 'currentColor' }}
+              />
+              <YAxis 
+                className="text-xs" 
+                tick={{ fill: 'currentColor' }}
+                allowDecimals={false}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar 
+                dataKey="orders" 
+                fill="currentColor" 
+                radius={[4, 4, 0, 0]}
+                className="fill-primary"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[200px] w-full flex items-center justify-center text-muted-foreground">
+            No data available
+          </div>
+        )}
+      </CardContent>
+    </Card>
             <Card className="col-span-3">
         <CardHeader>
           <CardTitle>Past Campaigns</CardTitle>
