@@ -29,7 +29,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       alert('Invalid credentials');
     }
   };
-  
 
   const signIn = (response: any) => {
     if (response.credential) {
@@ -39,8 +38,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
-  const handleGoogleError = (error: any) => {
-    console.error('Google OAuth Error:', error);
+  const handleGoogleError = () => {
+    console.error('Google OAuth Error');
     alert('Google login failed. Please try again.');
   };
 
@@ -107,7 +106,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             {loaded ? (
               <GoogleLogin
                 onSuccess={signIn}
-                onFailure={handleGoogleError}
+                onError={handleGoogleError} // Use `onError` instead of `onFailure`
                 useOneTap
                 shape="rectangular"
                 theme="filled_blue"

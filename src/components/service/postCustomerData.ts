@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 interface Customer {
-  customer_id: number;
+  customer_id?: number;
   first_name: string;
   last_name: string;
   email_id: string;
