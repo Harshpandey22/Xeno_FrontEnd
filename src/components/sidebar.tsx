@@ -11,7 +11,7 @@ const Sidebar: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('authToken'); // Adjust based on your app's token storage
     navigate('/login', { replace: true });
-    window.history.pushState(null, '', '/login'); // Optional
+    window.location.href = '/login'; // Force a full page reload
   };
 
   // Toggle sidebar visibility

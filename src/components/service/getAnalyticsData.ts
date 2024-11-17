@@ -74,3 +74,16 @@ export const getCommunicationLogs = async (): Promise<CommunicationLog[]> => {
       throw error;
     }
   };
+
+  export const getOrderProductRel = async (): Promise<Record<string, number>> => {
+    try {
+      const response = await axios.get('http://localhost:8080/get_orders_product_rel');
+      if (response.status === 200) {
+        return response.data;
+      }
+      throw new Error(`Unexpected response status: ${response.status}`);
+    } catch (error) {
+      console.error("Error fetching order-product relationship data:", error);
+      throw error;
+    }
+  };

@@ -31,7 +31,8 @@ const Dashboard: React.FC = () => {
         
         // Safely handle logs and limit to 5 items
         if (logs && Array.isArray(logs)) {
-          setCommunicationLogs(logs.slice(0,5));
+          const logs2 = logs.reverse();
+          setCommunicationLogs(logs2.slice(0,5));
         } else {
           setCommunicationLogs([]);
         }

@@ -8,6 +8,7 @@ import { postCustomerMessages } from './service/postCustomerMessage';
 import {EditCustomerModal} from './EditCustomerModal';
 import {AddOrderModal} from './AddOrderModal';
 import { storeCustomerData } from './service/postCustomerData';
+import { deleteOrdersByCustId, deleteCustomerById } from './service/deleteCustomerOrderData';
 
 interface Customer {
   customerId: number;
@@ -58,6 +59,9 @@ const Customers: React.FC = () => {
   const [showAddOrderModal, setShowAddOrderModal] = useState(false);
   const [selectedCustomerForEdit, setSelectedCustomerForEdit] = useState<Customer | null>(null);
   const [selectedCustomerForOrder, setSelectedCustomerForOrder] = useState<Customer | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
     first_name: '',
     last_name: '',
@@ -66,6 +70,35 @@ const Customers: React.FC = () => {
   });
 
   const navigate = useNavigate();
+
+  const handleDeleteCustomer = async (customer: Customer) => {
+    setCustomerToDelete(customer);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!customerToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      // First delete all orders
+      await deleteOrdersByCustId(customerToDelete.customerId);
+      // Then delete the customer
+      await deleteCustomerById(customerToDelete.customerId);
+      
+      // Refresh the customer list
+      await fetchCustomerData();
+      
+      setShowDeleteModal(false);
+      setCustomerToDelete(null);
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      alert("Failed to delete customer. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
 
   const fetchCustomerData = async () => {
     try {
@@ -246,7 +279,7 @@ const Customers: React.FC = () => {
               <td className="border border-gray-200 p-2">{customer.customer_visits}</td>
               <td className="border border-gray-200 p-2">{customer.delivery_receipt===null?'No message sent':customer.delivery_receipt}</td>
               <td className="border border-gray-200 p-2 flex gap-2">
-                <button
+              <button
                   className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                   onClick={() => handleViewOrders(customer)}
                 >
@@ -269,6 +302,12 @@ const Customers: React.FC = () => {
                   }}
                 >
                   Add Order
+                </button>
+                <button
+                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                  onClick={() => handleDeleteCustomer(customer)}
+                >
+                  Delete
                 </button>
               </td>
             </tr>
@@ -494,6 +533,38 @@ const Customers: React.FC = () => {
       onAdd={() => handleViewOrders(selectedCustomerForOrder)}
     />
   )}
+
+{showDeleteModal && customerToDelete && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
+            <p className="mb-4">
+              Are you sure you want to delete {customerToDelete.first_name} {customerToDelete.last_name}? 
+              This will also delete all associated orders and cannot be undone.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setCustomerToDelete(null);
+                }}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
