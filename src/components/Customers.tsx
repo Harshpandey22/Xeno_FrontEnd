@@ -5,6 +5,8 @@ import { getOrderData } from './service/getOrdersData';
 import { getSegments } from './service/getSegments';
 import { getSegmentCustomers } from './service/getSegmentCustomers';
 import { postCustomerMessages } from './service/postCustomerMessage';
+import {EditCustomerModal} from './EditCustomerModal';
+import {AddOrderModal} from './AddOrderModal';
 
 interface Customer {
   customerId: number;
@@ -51,6 +53,10 @@ const Customers: React.FC = () => {
   const [filters, setFilters] = useState('all');
   const [segments, setSegments] = useState<Segment[]>([]);
   const [displayCustomers, setDisplayCustomers] = useState<Customer[]>([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddOrderModal, setShowAddOrderModal] = useState(false);
+  const [selectedCustomerForEdit, setSelectedCustomerForEdit] = useState<Customer | null>(null);
+  const [selectedCustomerForOrder, setSelectedCustomerForOrder] = useState<Customer | null>(null);
   const [newCustomer, setNewCustomer] = useState<Partial<Customer>>({
     first_name: '',
     last_name: '',
@@ -248,9 +254,21 @@ const Customers: React.FC = () => {
                 </button>
                 <button
                   className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                  onClick={() => alert(`Edit ${customer.first_name}`)}
+                  onClick={() => {
+                    setSelectedCustomerForEdit(customer);
+                    setShowEditModal(true);
+                  }}
                 >
                   Edit
+                </button>
+                <button
+                  className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  onClick={() => {
+                    setSelectedCustomerForOrder(customer);
+                    setShowAddOrderModal(true);
+                  }}
+                >
+                  Add Order
                 </button>
               </td>
             </tr>
@@ -318,7 +336,7 @@ const Customers: React.FC = () => {
                         Total
                       </td>
                       <td className="border border-gray-200 p-2 font-bold">
-                        ₹{customerOrders.reduce((sum, order) => sum + order.orderPrice, 0).toLocaleString()}
+                      ₹{customerOrders.reduce((sum, order) => sum + Number(order.orderPrice), 0).toLocaleString()}
                       </td>
                     </tr>
                   </tfoot>
@@ -469,6 +487,29 @@ const Customers: React.FC = () => {
           </div>
         </div>
       )}
+      {showEditModal && selectedCustomerForEdit && (
+    <EditCustomerModal
+      customer={selectedCustomerForEdit}
+      isOpen={showEditModal}
+      onClose={() => {
+        setShowEditModal(false);
+        setSelectedCustomerForEdit(null);
+      }}
+      onUpdate={fetchCustomerData}
+    />
+  )}
+
+  {showAddOrderModal && selectedCustomerForOrder && (
+    <AddOrderModal
+      customerId={selectedCustomerForOrder.customerId}
+      isOpen={showAddOrderModal}
+      onClose={() => {
+        setShowAddOrderModal(false);
+        setSelectedCustomerForOrder(null);
+      }}
+      onAdd={() => handleViewOrders(selectedCustomerForOrder)}
+    />
+  )}
     </div>
   );
 };
