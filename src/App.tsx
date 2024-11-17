@@ -3,8 +3,8 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Dashboard from './components/dashboard';
 import Login from './components/login';
 import Sidebar from './components/sidebar';
-import Customers from './components/customers';
-import CustomerDetails from './components/customerDetails';
+import Customers from './components/Customers';
+import CustomerDetails from './components/CustomerDetails';
 import CampaignHistory from './components/campaignHistory'; // Import CampaignHistory component
 import Analytics from './components/analytics'; // Import Analytics component
 import './index.css';
