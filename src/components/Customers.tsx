@@ -7,6 +7,7 @@ import { getSegmentCustomers } from './service/getSegmentCustomers';
 import { postCustomerMessages } from './service/postCustomerMessage';
 import {EditCustomerModal} from './EditCustomerModal';
 import {AddOrderModal} from './AddOrderModal';
+import { storeCustomerData } from './service/postCustomerData';
 
 interface Customer {
   customerId: number;
@@ -57,13 +58,11 @@ const Customers: React.FC = () => {
   const [showAddOrderModal, setShowAddOrderModal] = useState(false);
   const [selectedCustomerForEdit, setSelectedCustomerForEdit] = useState<Customer | null>(null);
   const [selectedCustomerForOrder, setSelectedCustomerForOrder] = useState<Customer | null>(null);
-  const [newCustomer, setNewCustomer] = useState<Partial<Customer>>({
+  const [newCustomer, setNewCustomer] = useState({
     first_name: '',
     last_name: '',
     email_id: '',
     phone_number: '',
-    customer_visits: 0,
-    delivery_receipt: null
   });
 
   const navigate = useNavigate();
@@ -125,33 +124,34 @@ const Customers: React.FC = () => {
     }
   };
 
-  const handleAddCustomer = () => {
+  const handleAddCustomer = async () => {
     if (newCustomer.first_name?.trim() && newCustomer.email_id?.trim()) {
-      const newId = customers.length > 0 ? Math.max(...customers.map(c => c.customerId)) + 1 : 1;
-      const customerToAdd: Customer = {
-        customerId: newId,
-        first_name: newCustomer.first_name || '',
-        last_name: newCustomer.last_name || '',
-        email_id: newCustomer.email_id || '',
-        phone_number: newCustomer.phone_number || '',
-        customer_visits: newCustomer.customer_visits || 0,
-        delivery_receipt: newCustomer.delivery_receipt
-      };
-      
-      const updatedCustomers = [...customers, customerToAdd];
-      setCustomers(updatedCustomers);
-      setDisplayCustomers(updatedCustomers);
-      setNewCustomer({
-        first_name: '',
-        last_name: '',
-        email_id: '',
-        phone_number: '',
-        customer_visits: 0,
-        delivery_receipt: null
-      });
-      setShowAddModal(false);
+      try {
+        const customerToAdd = {
+          first_name: newCustomer.first_name,
+          last_name: newCustomer.last_name,
+          email_id: newCustomer.email_id,
+          phone_number: newCustomer.phone_number,
+          customer_visits: 0, // Setting initial visits to 0
+        };
+        
+        await storeCustomerData(customerToAdd);
+        await fetchCustomerData(); // Refresh the customer list
+        
+        setNewCustomer({
+          first_name: '',
+          last_name: '',
+          email_id: '',
+          phone_number: '',
+        });
+        
+        setShowAddModal(false);
+      } catch (error) {
+        console.error("Error adding customer:", error);
+        alert("Failed to add customer. Please try again.");
+      }
     } else {
-      alert('Please provide valid customer details.');
+      alert('Please provide at least first name and email.');
     }
   };
 
@@ -351,99 +351,83 @@ const Customers: React.FC = () => {
 
       {/* Add Customer Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-3xl">
-            <h2 className="text-lg font-bold mb-4">Add New Customer</h2>
-            <div className="flex gap-6">
-              {/* Left Section - Customer Details */}
-              <div className="w-1/2 space-y-4">
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Customer ID"
-                  value={newCustomer.id}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, id: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="First Name"
-                  value={newCustomer.firstName}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, firstName: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Last Name"
-                  value={newCustomer.lastName}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, lastName: e.target.value })}
-                />
-                <input
-                  type="email"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Email"
-                  value={newCustomer.email}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                />
-                <input
-                  type="tel"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Phone Number"
-                  value={newCustomer.phoneNumber}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, phoneNumber: e.target.value })}
-                />
-                <input
-                  type="number"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Visits"
-                  value={newCustomer.visits}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, visits: parseInt(e.target.value) })}
-                />
-              </div>
-
-              {/* Right Section - Order Details */}
-              <div className="w-1/2 space-y-4">
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Order ID"
-                  value={newCustomer.orderId}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, orderId: e.target.value })}
-                />
-                <input
-                  type="date"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Order Date"
-                  value={newCustomer.orderDate}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, orderDate: e.target.value })}
-                />
-                <input
-                  type="number"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Order Price"
-                  value={newCustomer.orderPrice}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, orderPrice: parseFloat(e.target.value) })}
-                />
-                
-              </div>
-            </div>
-            <div className="mt-4 flex gap-4">
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => setShowAddModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleAddCustomer}
-              >
-                Add Customer
-              </button>
-            </div>
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded shadow-lg w-full max-w-3xl">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold">Add New Customer</h2>
+          <button
+            className="text-gray-500 hover:text-gray-700"
+            onClick={() => setShowAddModal(false)}
+          >
+            ✕
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              First Name *
+            </label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="First Name"
+              value={newCustomer.first_name}
+              onChange={(e) => setNewCustomer({ ...newCustomer, first_name: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Last Name
+            </label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Last Name"
+              value={newCustomer.last_name}
+              onChange={(e) => setNewCustomer({ ...newCustomer, last_name: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email *
+            </label>
+            <input
+              type="email"
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Email"
+              value={newCustomer.email_id}
+              onChange={(e) => setNewCustomer({ ...newCustomer, email_id: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Phone Number"
+              value={newCustomer.phone_number}
+              onChange={(e) => setNewCustomer({ ...newCustomer, phone_number: e.target.value })}
+            />
           </div>
         </div>
-      )}
+        <div className="mt-6 flex justify-end gap-4">
+          <button
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            onClick={() => setShowAddModal(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={handleAddCustomer}
+          >
+            Add Customer
+          </button>
+        </div>
+      </div>
+    </div>)}
 
       {/* Send Message Modal */}
       {showMessageModal && (
