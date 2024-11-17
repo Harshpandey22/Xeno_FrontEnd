@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // Keep this import only
+import React, { useState } from 'react';
 import { Zap, Home, Users, LineChart, MessageSquare, LogOut, Menu } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -79,7 +79,7 @@ const Sidebar: React.FC = () => {
               {isOpen && <span>Analytics</span>}
             </NavLink>
             <NavLink
-              to="/messages"
+              to="/campaign-history"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 ${
                   isActive ? 'bg-accent text-primary' : 'text-muted-foreground hover:bg-accent hover:text-primary'
@@ -87,7 +87,7 @@ const Sidebar: React.FC = () => {
               }
             >
               <MessageSquare className="h-4 w-4" />
-              {isOpen && <span>Messages</span>}
+              {isOpen && <span>Campaign History</span>}
             </NavLink>
           </nav>
         </div>

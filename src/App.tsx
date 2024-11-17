@@ -5,6 +5,8 @@ import Login from './components/login';
 import Sidebar from './components/sidebar';
 import Customers from './components/customers';
 import CustomerDetails from './components/customerDetails';
+import CampaignHistory from './components/campaignHistory'; // Import CampaignHistory component
+import Analytics from './components/analytics'; // Import Analytics component
 import './index.css';
 
 // ProtectedRoute component for route protection
@@ -90,6 +92,36 @@ const App: React.FC = () => {
               <Sidebar />
               <div className="flex flex-col w-full p-4">
                 <CustomerDetails />
+              </div>
+            </div>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Campaign History Route */}
+      <Route
+        path="/campaign-history"
+        element={
+          <ProtectedRoute>
+            <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+              <Sidebar />
+              <div className="flex flex-col w-full p-4">
+                <CampaignHistory /> {/* Add the CampaignHistory component */}
+              </div>
+            </div>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Analytics Route */}
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+              <Sidebar />
+              <div className="flex flex-col w-full p-4">
+                <Analytics /> {/* Add the Analytics component */}
               </div>
             </div>
           </ProtectedRoute>
