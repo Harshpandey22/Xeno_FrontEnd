@@ -240,13 +240,13 @@ const Customers: React.FC = () => {
             ))}
           </select>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-gradient-to-r from-[#11998e] to-[#38ef7d]"
             onClick={() => setShowAddModal(true)}
           >
             Add New Customer
           </button>
           <button
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            className="px-4 py-2 bg-[#6495ED] text-white rounded hover:bg-gradient-to-r from-[#8E2DE2] to-[#4A00E0]"
             onClick={() => navigate('/customer-details')}
           >
             Add New Segment
@@ -257,36 +257,36 @@ const Customers: React.FC = () => {
       {/* Customers Table */}
       <table className="w-full border-collapse border border-gray-200">
         <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-200 p-2">ID</th>
-            <th className="border border-gray-200 p-2">First Name</th>
-            <th className="border border-gray-200 p-2">Last Name</th>
-            <th className="border border-gray-200 p-2">Email</th>
-            <th className="border border-gray-200 p-2">Phone</th>
-            <th className="border border-gray-200 p-2">Visits</th>
-            <th className="border border-gray-200 p-2">Delivery Receipt</th>
-            <th className="border border-gray-200 p-2">Actions</th>
+          <tr className="bg-[#808080]">
+            <th className="border border-gray-200 p-2 text-center align-middle">ID</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">First Name</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">Last Name</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">Email</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">Phone</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">Visits</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">Delivery Receipt</th>
+            <th className="border border-gray-200 p-2 text-center align-middle">Actions</th>
           </tr>
         </thead>
         <tbody>
           {displayCustomers.map((customer) => (
             <tr key={customer.customerId}>
-              <td className="border border-gray-200 p-2">{customer.customerId}</td>
-              <td className="border border-gray-200 p-2">{customer.first_name}</td>
-              <td className="border border-gray-200 p-2">{customer.last_name}</td>
-              <td className="border border-gray-200 p-2">{customer.email_id}</td>
-              <td className="border border-gray-200 p-2">{customer.phone_number}</td>
-              <td className="border border-gray-200 p-2">{customer.customer_visits}</td>
-              <td className="border border-gray-200 p-2">{customer.delivery_receipt===null?'No message sent':customer.delivery_receipt}</td>
-              <td className="border border-gray-200 p-2 flex gap-2">
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.customerId}</td>
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.first_name}</td>
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.last_name}</td>
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.email_id}</td>
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.phone_number}</td>
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.customer_visits}</td>
+              <td className="border border-gray-200 p-2 text-center align-middle">{customer.delivery_receipt===null?'No message sent':customer.delivery_receipt}</td>
+              <td className="border border-gray-200 p-2 flex gap-2 text-center align-middle">
               <button
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-3 py-1 bg-[#A8A8A8] text-white rounded hover:bg-[#2c3e50]"
                   onClick={() => handleViewOrders(customer)}
                 >
                   View Orders
                 </button>
                 <button
-                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  className="px-3 py-1 bg-[#A8A8A8] text-white rounded hover:bg-[#2c3e50]"
                   onClick={() => {
                     setSelectedCustomerForEdit(customer);
                     setShowEditModal(true);
@@ -295,7 +295,7 @@ const Customers: React.FC = () => {
                   Edit
                 </button>
                 <button
-                  className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  className="px-3 py-1 bg-[#A8A8A8] text-white rounded hover:bg-[#2c3e50]"
                   onClick={() => {
                     setSelectedCustomerForOrder(customer);
                     setShowAddOrderModal(true);
@@ -304,7 +304,7 @@ const Customers: React.FC = () => {
                   Add Order
                 </button>
                 <button
-                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="px-3 py-1 bg-[#E80000] text-white rounded hover:bg-[#2c3e50]"
                   onClick={() => handleDeleteCustomer(customer)}
                 >
                   Delete
@@ -350,7 +350,7 @@ const Customers: React.FC = () => {
             
             {customerOrders.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-200">
+                <table className="w-full border-collapse border border-gray-200 text-center align-middle">
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border border-gray-200 p-2">Order ID</th>
@@ -404,7 +404,7 @@ const Customers: React.FC = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              First Name *
+              First Name
             </label>
             <input
               type="text"
