@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, LineChart, Users, Settings, HelpCircle, Search } from 'lucide-react';
-import { Button } from './ui/button';
+import { LineChart, Users, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Input } from './ui/input';
 import { getCustomerCount, getOrderCount, getTotalRevenue, getCommunicationLogs, CommunicationLog, getCustomerOrderRel } from './service/getAnalyticsData';
