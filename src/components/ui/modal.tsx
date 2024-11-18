@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils'; // Import utility for conditional classnames if available
+// import { cn } from '@/lib/utils'; // Import utility for conditional classnames if available
 
 interface ModalProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
           className="absolute top-2 right-2 text-gray-500 hover:text-black"
           onClick={onClose}
         >
-          ×
+          
         </button>
         {children}
       </div>
